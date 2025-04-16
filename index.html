@@ -1,0 +1,149 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart AI Poem Writer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.3/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f2f4f8;
+            font-family: 'Poppins', sans-serif;
+            color: #000;
+        }
+        button {
+            background-color: #fff;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-md bg-white rounded-lg p-6 shadow-lg">
+        <form id="poemForm" class="flex flex-col gap-4">
+            <label for="topic" class="sr-only">Poem Topic</label>
+            <input type="text" id="topic" class="p-2 rounded" placeholder="Enter poem topic" required>
+            
+            <label for="style" class="sr-only">Poem Style</label>
+            <select id="style" class="p-2 rounded" required>
+                <option value="Romantic">Romantic</option>
+                <option value="Sad">Sad</option>
+                <option value="Nature">Nature</option>
+                <option value="Motivational">Motivational</option>
+            </select>
+
+            <button id="generateBtn" type="button" class="py-2 px-4 text-black" aria-label="Generate Poem">Let's Rhyme and Roll!</button>
+            <button id="regenerateBtn" type="button" class="py-2 px-4 text-black" aria-label="Regenerate Poem">Regenerate Poem</button>
+        </form>
+
+        <div id="output" class="mt-6 p-4 rounded bg-white text-black" aria-live="polite"></div>
+
+        <div class="flex justify-between mt-4">
+            <button id="copyBtn" class="py-2 px-4 text-black" aria-label="Copy Poem">Copy</button>
+            <button id="downloadBtn" class="py-2 px-4 text-black" aria-label="Download Poem">Download</button>
+            <button id="shareBtn" class="py-2 px-4 text-black" aria-label="Share Poem">Share</button>
+            <button id="clearBtn" class="py-2 px-4 text-black" aria-label="Clear Inputs">Clear</button>
+        </div>
+    </div>
+
+    <footer class="mt-4">
+        <a href="#" class="text-black">Made with ❤️</a>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const topicInput = document.getElementById('topic');
+            const styleSelect = document.getElementById('style');
+            const generateBtn = document.getElementById('generateBtn');
+            const regenerateBtn = document.getElementById('regenerateBtn');
+            const output = document.getElementById('output');
+            const copyBtn = document.getElementById('copyBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const shareBtn = document.getElementById('shareBtn');
+            const clearBtn = document.getElementById('clearBtn');
+
+            const startWebSocket = (prompt) => {
+                const websocket = new WebSocket('wss://backend.buildpicoapps.com/ask_ai_streaming_v2');
+                
+                websocket.addEventListener("open", () => {
+                    websocket.send(
+                        JSON.stringify({
+                            appId: "create-miss",
+                            prompt: prompt,
+                        })
+                    );
+                });
+
+                websocket.addEventListener("message", (event) => {
+                    console.log(event.data);
+                    output.innerText = `${output.innerText}${event.data}`;
+                });
+
+                websocket.addEventListener("close", (event) => {
+                    console.log("Connection closed", event.code, event.reason);
+                    if (event.code != 1000) {
+                        alert("Oops, we ran into an error. Refresh the page and try again.");
+                    }
+                });
+
+                websocket.addEventListener("error", (error) => {
+                    console.log('WebSocket error', error);
+                    alert("Oops, we ran into an error. Refresh the page and try again.");
+                });
+            };
+
+            const generatePoem = () => {
+                const topic = topicInput.value;
+                const style = styleSelect.value;
+                const prompt = `This story has been crafted using artificial intelligence, inspired by your input and imagination.
+If you don't like the story, feel free to let me know — I'm here for you.
+AI Poem Writer
+Developer: S M Ripon
+
+Topic: ${topic}, Style: ${style}`;
+
+                output.innerText = '';
+                startWebSocket(prompt);
+            };
+
+            generateBtn.addEventListener('click', generatePoem);
+            regenerateBtn.addEventListener('click', generatePoem);
+
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(output.innerText).then(() => {
+                    alert('Poem copied to clipboard!');
+                });
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                const blob = new Blob([output.innerText], { type: "text/plain" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'poem.txt';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            });
+
+            shareBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.share({
+                        title: 'AI Poem',
+                        text: output.innerText,
+                    });
+                } catch (err) {
+                    console.error('Error sharing:', err);
+                    alert("Sharing failed. Ensure your device supports this feature.");
+                }
+            });
+
+            clearBtn.addEventListener('click', () => {
+                topicInput.value = '';
+                styleSelect.selectedIndex = 0;
+                output.innerText = '';
+            });
+        });
+    </script>
+</body>
+</html>
