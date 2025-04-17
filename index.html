@@ -2,51 +2,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart AI Poem Writer</title>
+    <title>Premium AI Poem Writer</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.3/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f2f4f8;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
             font-family: 'Poppins', sans-serif;
-            color: #000;
+            animation: gradientShift 15s ease infinite;
+            background-size: 200% 200%;
         }
+        @keyframes gradientShift {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
         button {
-            background-color: #fff;
-            border-radius: 0.375rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(45deg, #ec4899, #8b5cf6);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
+            font-weight: 600;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        #output {
+            scroll-behavior: smooth;
+            overflow-y: auto;
+            max-height: 400px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 0.75rem;
+            display: none; /* Initially hidden */
+        }
+
+        .action-buttons {
+            display: none; /* Initially hidden */
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #ec4899, #8b5cf6);
+            border-radius: 4px;
+        }
+
+        select, input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        select:focus, input:focus {
+            border-color: #8b5cf6;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
         }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
-    <div class="w-full max-w-md bg-white rounded-lg p-6 shadow-lg">
+    <div class="w-full max-w-md bg-white/90 rounded-xl p-6 shadow-2xl backdrop-blur-lg">
         <form id="poemForm" class="flex flex-col gap-4">
-            <label for="topic" class="sr-only">Poem Topic</label>
-            <input type="text" id="topic" class="p-2 rounded" placeholder="Enter poem topic" required>
+            <input type="text" id="topic" class="p-3 rounded-lg" 
+                   placeholder="✨ Enter poem topic" required>
             
-            <label for="style" class="sr-only">Poem Style</label>
-            <select id="style" class="p-2 rounded" required>
-                <option value="Romantic">Romantic</option>
-                <option value="Sad">Sad</option>
-                <option value="Nature">Nature</option>
-                <option value="Motivational">Motivational</option>
+            <select id="style" class="p-3 rounded-lg" required>
+                <option value="Romantic">🌹 Romantic</option>
+                <option value="Sad">😢 Sad</option>
+                <option value="Nature">🍃 Nature</option>
+                <option value="Motivational">💪 Motivational</option>
+                <option value="Funny">😂 Funny</option>
+                <option value="Love">💖 Love</option>
+                <option value="Friendship">👫 Friendship</option>
+                <option value="Adventure">🗺️ Adventure</option>
+                <option value="Fantasy">🧙 Fantasy</option>
+                <option value="Mystical">🔮 Mystical</option>
+                <option value="Philosophical">🤔 Philosophical</option>
+                <option value="Hopeful">🌈 Hopeful</option>
+                <option value="Nostalgic">📻 Nostalgic</option>
+                <option value="Spiritual">🕊️ Spiritual</option>
+                <option value="Inspirational">✨ Inspirational</option>
             </select>
 
-            <button id="generateBtn" type="button" class="py-2 px-4 text-black" aria-label="Generate Poem">Let's Rhyme and Roll!</button>
-            <button id="regenerateBtn" type="button" class="py-2 px-4 text-black" aria-label="Regenerate Poem">Regenerate Poem</button>
+            <button id="generateBtn" type="button" class="py-3 px-6 text-white font-bold">🌟 Generate Poem</button>
         </form>
 
-        <div id="output" class="mt-6 p-4 rounded bg-white text-black" aria-live="polite"></div>
+        <div id="output" class="mt-6 p-4 rounded-lg text-gray-800 font-medium leading-relaxed transition-all duration-300"></div>
 
-        <div class="flex justify-between mt-4">
-            <button id="copyBtn" class="py-2 px-4 text-black" aria-label="Copy Poem">Copy</button>
-            <button id="downloadBtn" class="py-2 px-4 text-black" aria-label="Download Poem">Download</button>
-            <button id="shareBtn" class="py-2 px-4 text-black" aria-label="Share Poem">Share</button>
-            <button id="clearBtn" class="py-2 px-4 text-black" aria-label="Clear Inputs">Clear</button>
+        <div id="actionButtons" class="grid grid-cols-2 gap-3 mt-4 action-buttons">
+            <button id="regenerateBtn" class="py-2 px-4">🔄 Regenerate</button>
+            <button id="copyBtn" class="py-2 px-4">📋 Copy</button>
+            <button id="downloadBtn" class="py-2 px-4">⏬ Download</button>
+            <button id="shareBtn" class="py-2 px-4">📤 Share</button>
+            <button id="clearBtn" class="py-2 px-4">🗑️ Clear</button>
         </div>
     </div>
 
-    <footer class="mt-4">
-        <a href="#" class="text-black">Made with ❤️</a>
+    <footer class="mt-6 animate-pulse">
+        <a href="#" class="text-white/90 hover:text-white transition-colors">Made with ❤️ by PoemAI</a>
     </footer>
 
     <script>
@@ -60,6 +118,7 @@
             const downloadBtn = document.getElementById('downloadBtn');
             const shareBtn = document.getElementById('shareBtn');
             const clearBtn = document.getElementById('clearBtn');
+            const actionButtons = document.getElementById('actionButtons');
 
             const startWebSocket = (prompt) => {
                 const websocket = new WebSocket('wss://backend.buildpicoapps.com/ask_ai_streaming_v2');
@@ -74,12 +133,13 @@
                 });
 
                 websocket.addEventListener("message", (event) => {
-                    console.log(event.data);
+                    output.style.display = 'block';
                     output.innerText = `${output.innerText}${event.data}`;
                 });
 
                 websocket.addEventListener("close", (event) => {
                     console.log("Connection closed", event.code, event.reason);
+                    actionButtons.style.display = 'grid';
                     if (event.code != 1000) {
                         alert("Oops, we ran into an error. Refresh the page and try again.");
                     }
@@ -94,14 +154,16 @@
             const generatePoem = () => {
                 const topic = topicInput.value;
                 const style = styleSelect.value;
-                const prompt = `This story has been crafted using artificial intelligence, inspired by your input and imagination.
-If you don't like the story, feel free to let me know — I'm here for you.
+                const prompt = `This poem has been crafted using artificial intelligence, inspired by your input and imagination.
+If you don't like the poem, feel free to let me know — I'm here for you.
 AI Poem Writer
 Developer: S M Ripon
 
 Topic: ${topic}, Style: ${style}`;
 
                 output.innerText = '';
+                output.style.display = 'none';
+                actionButtons.style.display = 'none';
                 startWebSocket(prompt);
             };
 
@@ -142,6 +204,8 @@ Topic: ${topic}, Style: ${style}`;
                 topicInput.value = '';
                 styleSelect.selectedIndex = 0;
                 output.innerText = '';
+                output.style.display = 'none';
+                actionButtons.style.display = 'none';
             });
         });
     </script>
